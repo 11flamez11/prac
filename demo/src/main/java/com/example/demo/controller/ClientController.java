@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/clients")
 public class ClientController {
 
