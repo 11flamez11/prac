@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.CarDto;
+import com.example.demo.mapper.CarMapper;
 import com.example.demo.model.Car;
 import com.example.demo.model.Client;
 import com.example.demo.repository.CarRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CarService {
@@ -20,89 +23,89 @@ public class CarService {
     @Autowired
     private ClientRepository clientRepository;
 
-    public List<Car> getAllCars() {
-        return carRepository.findAll();
+    public List<CarDto> getAllCars() {
+        return carRepository.findAll().stream()
+                .map(CarMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<Car> getCarById(Long id) {
+    public ResponseEntity<CarDto> getCarById(Long id) {
         return carRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(car -> ResponseEntity.ok(CarMapper.toDto(car)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<Car> createCar(Car car) {
-        if (car.getClient() != null) {
-            Optional<Client> client = clientRepository.findById(car.getClient().getId());
-            if (client.isEmpty()) {
-                return ResponseEntity.badRequest().build();
-            }
-            car.setClient(client.get());
+    public ResponseEntity<CarDto> createCar(CarDto carDto) {
+        if (carDto.getClientId() == null || !clientRepository.existsById(carDto.getClientId())) {
+            return ResponseEntity.badRequest().body(null);
         }
-        return ResponseEntity.ok(carRepository.save(car));
+
+        Car car = CarMapper.toEntity(carDto);
+        clientRepository.findById(carDto.getClientId()).ifPresent(car::setClient);
+        Car savedCar = carRepository.save(car);
+        return ResponseEntity.ok(CarMapper.toDto(savedCar));
     }
 
-    public ResponseEntity<Car> updateCar(Long id, Car carDetails) {
+    public ResponseEntity<CarDto> updateCar(Long id, CarDto carDto) {
         Optional<Car> carOptional = carRepository.findById(id);
-        if (carOptional.isEmpty()) {
+        if (carOptional.isPresent()) {
+            Car carToUpdate = carOptional.get();
+
+            if (carDto.getVin() != null) {
+                carToUpdate.setVin(carDto.getVin());
+            }
+            if (carDto.getMarkModel() != null) {
+                carToUpdate.setMarkModel(carDto.getMarkModel());
+            }
+            if (carDto.getYearManufacture() != 0) {
+                carToUpdate.setYearManufacture(carDto.getYearManufacture());
+            }
+            if (carDto.getPlateNum() != null) {
+                carToUpdate.setPlateNum(carDto.getPlateNum());
+            }
+            if (carDto.getLastServiceDate() != null) {
+                carToUpdate.setLastServiceDate(carDto.getLastServiceDate());
+            }
+
+            if (carDto.getClientId() != null && (carToUpdate.getClient() == null || !carToUpdate.getClient().getId().equals(carDto.getClientId()))) {
+                Optional<Client> clientOptional = clientRepository.findById(carDto.getClientId());
+                if (clientOptional.isEmpty()) {
+                    return ResponseEntity.badRequest().build();
+                }
+                carToUpdate.setClient(clientOptional.get());
+            }
+
+            Car updatedCar = carRepository.save(carToUpdate);
+            return ResponseEntity.ok(CarMapper.toDto(updatedCar));
+        } else {
             return ResponseEntity.notFound().build();
         }
-
-        Car car = carOptional.get();
-
-        if (carDetails.getVin() != null) {
-            car.setVin(carDetails.getVin());
-        }
-        if (carDetails.getMarkModel() != null) {
-            car.setMarkModel(carDetails.getMarkModel());
-        }
-        if (carDetails.getYearManufacture() != 0) {
-            car.setYearManufacture(carDetails.getYearManufacture());
-        }
-        if (carDetails.getPlateNum() != null) {
-            car.setPlateNum(carDetails.getPlateNum());
-        }
-        if (carDetails.getLastServiceDate() != null) {
-            car.setLastServiceDate(carDetails.getLastServiceDate());
-        }
-
-        if (carDetails.getClient() != null) {
-            Optional<Client> client = clientRepository.findById(carDetails.getClient().getId());
-            if (client.isEmpty()) {
-                return ResponseEntity.badRequest().build();
-            }
-            car.setClient(client.get());
-        }
-
-        return ResponseEntity.ok(carRepository.save(car));
     }
+
 
     public ResponseEntity<Void> deleteCar(Long id) {
-        if (!carRepository.existsById(id)) {
+        if (carRepository.existsById(id)) {
+            carRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
             return ResponseEntity.notFound().build();
         }
-        carRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
-    public List<Car> searchCars(String vin, String markModel, String plateNum, Integer yearManufacture) {
-        if (vin != null) {
-            return carRepository.findByVinContainingIgnoreCase(vin);
-        } else if (markModel != null) {
-            return carRepository.findByMarkModelContainingIgnoreCase(markModel);
-        } else if (plateNum != null) {
-            return carRepository.findByPlateNumContainingIgnoreCase(plateNum);
-        } else if (yearManufacture != null) {
-            return carRepository.findByYearManufacture(yearManufacture);
-        } else {
-            return carRepository.findAll();
-        }
+    public List<CarDto> searchCars(String vin, String markModel, String plateNum, Integer yearManufacture) {
+        return carRepository.findAll().stream()
+                .filter(car -> (vin == null || car.getVin().equalsIgnoreCase(vin)) &&
+                        (markModel == null || car.getMarkModel().equalsIgnoreCase(markModel)) &&
+                        (plateNum == null || car.getPlateNum().equalsIgnoreCase(plateNum)) &&
+                        (yearManufacture == null || car.getYearManufacture() == yearManufacture))
+                .map(CarMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<Car>> getCarsByClientId(Long clientId) {
-        List<Car> cars = carRepository.findByClientId(clientId);
-        if (cars.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+    public ResponseEntity<List<CarDto>> getCarsByClientId(Long clientId) {
+        List<CarDto> cars = carRepository.findByClientId(clientId).stream()
+                .map(CarMapper::toDto)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(cars);
     }
 }

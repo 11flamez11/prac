@@ -1,9 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.ServiceEntity;
+import com.example.demo.dto.ServiceDto;
 import com.example.demo.service.ServiceService;
+import com.example.demo.validation.OnUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,23 +18,23 @@ public class ServiceController {
     private ServiceService serviceService;
 
     @GetMapping
-    public List<ServiceEntity> getAllServices() {
+    public List<ServiceDto> getAllServices() {
         return serviceService.getAllServices();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceEntity> getServiceById(@PathVariable Long id) {
+    public ResponseEntity<ServiceDto> getServiceById(@PathVariable Long id) {
         return serviceService.getServiceById(id);
     }
 
     @PostMapping
-    public ServiceEntity createService(@RequestBody ServiceEntity service) {
-        return serviceService.createService(service);
+    public ServiceDto createService(@RequestBody ServiceDto serviceDto) {
+        return serviceService.createService(serviceDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceEntity> updateService(@PathVariable Long id, @RequestBody ServiceEntity serviceDetails) {
-        return serviceService.updateService(id, serviceDetails);
+    public ResponseEntity<ServiceDto> updateService(@PathVariable Long id, @RequestBody @Validated(OnUpdate.class) ServiceDto serviceDto) {
+        return serviceService.updateService(id, serviceDto);
     }
 
     @DeleteMapping("/{id}")
@@ -41,7 +43,7 @@ public class ServiceController {
     }
 
     @GetMapping("/search")
-    public List<ServiceEntity> searchServices(
+    public List<ServiceDto> searchServices(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) Double price

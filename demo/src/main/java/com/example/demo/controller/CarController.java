@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Car;
+import com.example.demo.dto.CarDto;
 import com.example.demo.service.CarService;
+import com.example.demo.validation.OnCreate;
+import com.example.demo.validation.OnUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,23 +19,23 @@ public class CarController {
     private CarService carService;
 
     @GetMapping
-    public List<Car> getAllCars() {
+    public List<CarDto> getAllCars() {
         return carService.getAllCars();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Car> getCarById(@PathVariable Long id) {
+    public ResponseEntity<CarDto> getCarById(@PathVariable Long id) {
         return carService.getCarById(id);
     }
 
     @PostMapping
-    public ResponseEntity<Car> createCar(@RequestBody Car car) {
-        return carService.createCar(car);
+    public ResponseEntity<CarDto> createCar(@RequestBody @Validated(OnCreate.class) CarDto carDto) {
+        return carService.createCar(carDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Car> updateCar(@PathVariable Long id, @RequestBody Car carDetails) {
-        return carService.updateCar(id, carDetails);
+    public ResponseEntity<CarDto> updateCar(@PathVariable Long id, @RequestBody @Validated(OnUpdate.class) CarDto carDto) {
+        return carService.updateCar(id, carDto);
     }
 
     @DeleteMapping("/{id}")
@@ -41,7 +44,7 @@ public class CarController {
     }
 
     @GetMapping("/search")
-    public List<Car> searchCars(
+    public List<CarDto> searchCars(
             @RequestParam(required = false) String vin,
             @RequestParam(required = false) String markModel,
             @RequestParam(required = false) String plateNum,
@@ -50,7 +53,7 @@ public class CarController {
     }
 
     @GetMapping("/by-client/{clientId}")
-    public ResponseEntity<List<Car>> getCarsByClientId(@PathVariable Long clientId) {
+    public ResponseEntity<List<CarDto>> getCarsByClientId(@PathVariable Long clientId) {
         return carService.getCarsByClientId(clientId);
     }
 }

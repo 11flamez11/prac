@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.ServiceDto;
+import com.example.demo.mapper.ServiceMapper;
 import com.example.demo.model.ServiceEntity;
 import com.example.demo.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceService {
@@ -15,41 +18,53 @@ public class ServiceService {
     @Autowired
     private ServiceRepository serviceRepository;
 
-    public List<ServiceEntity> getAllServices() {
-        return serviceRepository.findAll();
+    public List<ServiceDto> getAllServices() {
+        return serviceRepository.findAll().stream()
+                .map(ServiceMapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<ServiceEntity> getServiceById(Long id) {
+    public ResponseEntity<ServiceDto> getServiceById(Long id) {
         return serviceRepository.findById(id)
-                .map(ResponseEntity::ok)
+                .map(service -> ResponseEntity.ok(ServiceMapper.toDto(service)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public ServiceEntity createService(ServiceEntity service) {
-        return serviceRepository.save(service);
+    public ServiceDto createService(ServiceDto serviceDto) {
+        ServiceEntity service = ServiceMapper.toEntity(serviceDto);
+        ServiceEntity savedService = serviceRepository.save(service);
+        return ServiceMapper.toDto(savedService);
     }
 
-    public ResponseEntity<ServiceEntity> updateService(Long id, ServiceEntity serviceDetails) {
+    public ResponseEntity<ServiceDto> updateService(Long id, ServiceDto serviceDto) {
         Optional<ServiceEntity> serviceOptional = serviceRepository.findById(id);
         if (serviceOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        ServiceEntity service = serviceOptional.get();
+        ServiceEntity existingService = serviceOptional.get();
 
-        if (serviceDetails.getName() != null) {
-            service.setName(serviceDetails.getName());
+        if (serviceDto.getName() != null) {
+            existingService.setName(serviceDto.getName());
         }
 
-        if (serviceDetails.getDescription() != null) {
-            service.setDescription(serviceDetails.getDescription());
+        if (serviceDto.getDescription() != null) {
+            existingService.setDescription(serviceDto.getDescription());
         }
 
-        if (serviceDetails.getPrice() != null) {
-            service.setPrice(serviceDetails.getPrice());
+        if (serviceDto.getPrice() != null) {
+            existingService.setPrice(serviceDto.getPrice());
         }
 
-        return ResponseEntity.ok(serviceRepository.save(service));
+        ServiceEntity updatedService = serviceRepository.save(existingService);
+
+        ServiceDto updatedDto = new ServiceDto();
+        updatedDto.setId(updatedService.getId());
+        updatedDto.setName(updatedService.getName());
+        updatedDto.setDescription(updatedService.getDescription());
+        updatedDto.setPrice(updatedService.getPrice());
+
+        return ResponseEntity.ok(updatedDto);
     }
 
 
@@ -61,15 +76,21 @@ public class ServiceService {
         return ResponseEntity.noContent().build();
     }
 
-    public List<ServiceEntity> searchServices(String name, String description, Double price) {
+    public List<ServiceDto> searchServices(String name, String description, Double price) {
+        List<ServiceEntity> results;
+
         if (name != null) {
-            return serviceRepository.findByNameContainingIgnoreCase(name);
+            results = serviceRepository.findByNameContainingIgnoreCase(name);
         } else if (description != null) {
-            return serviceRepository.findByDescriptionContainingIgnoreCase(description);
+            results = serviceRepository.findByDescriptionContainingIgnoreCase(description);
         } else if (price != null) {
-            return serviceRepository.findByPrice(price);
+            results = serviceRepository.findByPrice(price);
         } else {
-            return serviceRepository.findAll();
+            results = serviceRepository.findAll();
         }
+
+        return results.stream()
+                .map(ServiceMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

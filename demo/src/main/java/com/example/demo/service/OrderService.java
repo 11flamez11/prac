@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.OrderDto;
+import com.example.demo.mapper.OrderMapper;
 import com.example.demo.model.Car;
 import com.example.demo.model.OrderEntity;
 import com.example.demo.model.ServiceEntity;
@@ -26,73 +28,79 @@ public class OrderService {
     @Autowired
     private ServiceRepository serviceRepository;
 
-    public List<OrderEntity> getAllOrders() {
-        return orderRepository.findAll();
+    public List<OrderDto> getAllOrders() {
+        return orderRepository.findAll().stream()
+                .map(OrderMapper::toDto)
+                .toList();
     }
 
-    public ResponseEntity<OrderEntity> getOrderById(Long id) {
-        return orderRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<OrderDto> getOrderById(Long id) {
+        Optional<OrderEntity> orderOpt = orderRepository.findById(id);
+        if (orderOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(OrderMapper.toDto(orderOpt.get()));
     }
 
-    public ResponseEntity<OrderEntity> createOrder(OrderEntity order) {
-        if (order.getCar() == null || order.getService() == null) {
+    public ResponseEntity<OrderDto> createOrder(OrderDto orderDto) {
+        if (orderDto.getCarId() == null || orderDto.getServiceId() == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        Optional<Car> car = carRepository.findById(order.getCar().getId());
-        Optional<ServiceEntity> service = serviceRepository.findById(order.getService().getId());
+        Optional<Car> carOpt = carRepository.findById(orderDto.getCarId());
+        Optional<ServiceEntity> serviceOpt = serviceRepository.findById(orderDto.getServiceId());
 
-        if (car.isEmpty() || service.isEmpty()) {
+        if (carOpt.isEmpty() || serviceOpt.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
-        order.setCar(car.get());
-        order.setService(service.get());
+        OrderEntity order = OrderMapper.toEntity(orderDto);
+        order.setCar(carOpt.get());
+        order.setService(serviceOpt.get());
 
-        return ResponseEntity.ok(orderRepository.save(order));
+        OrderEntity savedOrder = orderRepository.save(order);
+        return ResponseEntity.ok(OrderMapper.toDto(savedOrder));
     }
 
-    public ResponseEntity<OrderEntity> updateOrder(Long id, OrderEntity orderDetails) {
-        Optional<OrderEntity> orderOptional = orderRepository.findById(id);
-        if (orderOptional.isEmpty()) {
+    public ResponseEntity<OrderDto> updateOrder(Long id, OrderDto orderDto) {
+        Optional<OrderEntity> orderOpt = orderRepository.findById(id);
+        if (orderOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        OrderEntity order = orderOptional.get();
+        OrderEntity order = orderOpt.get();
 
-        if (orderDetails.getCar() != null) {
-            Optional<Car> car = carRepository.findById(orderDetails.getCar().getId());
-            if (car.isEmpty()) return ResponseEntity.badRequest().build();
-            order.setCar(car.get());
+        if (orderDto.getCarId() != null) {
+            Optional<Car> carOpt = carRepository.findById(orderDto.getCarId());
+            if (carOpt.isEmpty()) return ResponseEntity.badRequest().build();
+            order.setCar(carOpt.get());
         }
 
-        if (orderDetails.getService() != null) {
-            Optional<ServiceEntity> service = serviceRepository.findById(orderDetails.getService().getId());
-            if (service.isEmpty()) return ResponseEntity.badRequest().build();
-            order.setService(service.get());
+        if (orderDto.getServiceId() != null) {
+            Optional<ServiceEntity> serviceOpt = serviceRepository.findById(orderDto.getServiceId());
+            if (serviceOpt.isEmpty()) return ResponseEntity.badRequest().build();
+            order.setService(serviceOpt.get());
         }
 
-        if (orderDetails.getOrderDate() != null) {
-            order.setOrderDate(orderDetails.getOrderDate());
+        if (orderDto.getOrderDate() != null) {
+            order.setOrderDate(orderDto.getOrderDate());
         }
 
-        if (orderDetails.getCompletionDate() != null) {
-            order.setCompletionDate(orderDetails.getCompletionDate());
+        if (orderDto.getCompletionDate() != null) {
+            order.setCompletionDate(orderDto.getCompletionDate());
         }
 
-        if (orderDetails.getStatus() != null) {
-            order.setStatus(orderDetails.getStatus());
+        if (orderDto.getStatus() != null) {
+            order.setStatus(orderDto.getStatus());
         }
 
-        if (orderDetails.getTotalCost() != null) {
-            order.setTotalCost(orderDetails.getTotalCost());
+        if (orderDto.getTotalCost() != null) {
+            order.setTotalCost(orderDto.getTotalCost());
         }
 
-        return ResponseEntity.ok(orderRepository.save(order));
+        OrderEntity updatedOrder = orderRepository.save(order);
+        return ResponseEntity.ok(OrderMapper.toDto(updatedOrder));
     }
-
 
     public ResponseEntity<Void> deleteOrder(Long id) {
         if (!orderRepository.existsById(id)) {
