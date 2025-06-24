@@ -1,21 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { ClientService, ClientDto } from './client.service';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-client',
   standalone: true,
   templateUrl: './client.html',
   styleUrls: ['./client.scss'],
-  imports: [HttpClientModule, CommonModule]
+  imports: [NgFor]
 })
 export class ClientComponent implements OnInit {
-  clients: any[] = [];
+  clients: ClientDto[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private clientService: ClientService) {}
 
   ngOnInit() {
-    this.http.get<any[]>('http://localhost:8080/clients')
-      .subscribe(data => this.clients = data);
+    this.clientService.getAllClients().subscribe(data => {
+      this.clients = data;
+    });
   }
 }
