@@ -7,7 +7,7 @@ import com.example.demo.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Sort;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -77,16 +77,17 @@ public class ServiceService {
     }
 
     public List<ServiceDto> searchServices(String name, String description, Double price) {
+        Sort sortByIdAsc = Sort.by(Sort.Direction.ASC, "id");
         List<ServiceEntity> results;
 
         if (name != null) {
-            results = serviceRepository.findByNameContainingIgnoreCase(name);
+            results = serviceRepository.findByNameContainingIgnoreCase(name, sortByIdAsc);
         } else if (description != null) {
-            results = serviceRepository.findByDescriptionContainingIgnoreCase(description);
+            results = serviceRepository.findByDescriptionContainingIgnoreCase(description, sortByIdAsc);
         } else if (price != null) {
-            results = serviceRepository.findByPrice(price);
+            results = serviceRepository.findByPrice(price, sortByIdAsc);
         } else {
-            results = serviceRepository.findAll();
+            results = serviceRepository.findAll(sortByIdAsc);
         }
 
         return results.stream()

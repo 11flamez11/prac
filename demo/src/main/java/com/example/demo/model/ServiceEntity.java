@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "service")
 public class ServiceEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "service_id")
     private Long id;
 

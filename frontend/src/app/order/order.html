@@ -1,3 +1,31 @@
-<h2>Order Component</h2>
-<p>Информация о заказах.</p>
+<div class="container">
+  <h1>Управление заказами</h1>
 
+  <form (ngSubmit)="onSubmit()" class="order-form">
+    <input type="number" [(ngModel)]="currentOrder.carId" name="carId" placeholder="ID автомобиля" required />
+    <input type="number" [(ngModel)]="currentOrder.serviceId" name="serviceId" placeholder="ID услуги" required />
+    <input type="date" [(ngModel)]="currentOrder.orderDate" name="orderDate" placeholder="Дата заказа" required />
+    <input type="date" [(ngModel)]="currentOrder.completionDate" name="completionDate" placeholder="Дата выполнения" required />
+    <input type="text" [(ngModel)]="currentOrder.status" name="status" placeholder="Статус" required />
+    <input type="number" [(ngModel)]="currentOrder.totalCost" name="totalCost" placeholder="Общая стоимость" required />
+
+    <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }}</button>
+    <button type="button" (click)="cancelEdit()" *ngIf="isEditing">Отмена</button>
+  </form>
+
+  <div *ngFor="let order of orders" class="order-card">
+    <h2>Заказ №{{ order.id }}</h2>
+    <p><strong>ID машины:</strong> {{ order.carId }}</p>
+    <p><strong>ID услуги:</strong> {{ order.serviceId }}</p>
+    <p><strong>Дата заказа:</strong> {{ order.orderDate }}</p>
+    <p><strong>Дата выполнения:</strong> {{ order.completionDate }}</p>
+    <p><strong>Статус:</strong> {{ order.status }}</p>
+    <p><strong>Общая стоимость:</strong> {{ order.totalCost }} руб.</p>
+    <button (click)="editOrder(order)">Редактировать</button>
+    <button (click)="deleteOrder(order.id)">Удалить</button>
+  </div>
+
+  <div *ngIf="message" [ngClass]="{'toast-message': true, 'success': !isError, 'error': isError}">
+    {{ message }}
+  </div>
+</div>

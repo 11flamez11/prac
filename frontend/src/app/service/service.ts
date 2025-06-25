@@ -25,12 +25,11 @@ export class ServiceComponent implements OnInit {
     this.loadServices();
   }
 
-  loadServices() {
-    this.serviceService.getAllServices().subscribe(data => {
-      this.services = data;
-    });
-  }
-
+loadServices() {
+  this.serviceService.getAllServices().subscribe(data => {
+    this.services = data.sort((a, b) => (a.id! - b.id!));
+  });
+}
   onSubmit() {
     if (this.isEditing && this.currentService.id) {
       this.serviceService.updateService(this.currentService.id, this.currentService).subscribe({
