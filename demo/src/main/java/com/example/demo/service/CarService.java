@@ -9,6 +9,7 @@ import com.example.demo.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class CarService {
     private ClientRepository clientRepository;
 
     public List<CarDto> getAllCars() {
-        return carRepository.findAll().stream()
+        return carRepository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream()
                 .map(CarMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -103,7 +104,7 @@ public class CarService {
     }
 
     public ResponseEntity<List<CarDto>> getCarsByClientId(Long clientId) {
-        List<CarDto> cars = carRepository.findByClientId(clientId).stream()
+        List<CarDto> cars = carRepository.findByClientId(clientId, Sort.by(Sort.Direction.ASC, "id")).stream()
                 .map(CarMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(cars);

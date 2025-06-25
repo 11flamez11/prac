@@ -1,2 +1,31 @@
-<h2>Car Component</h2>
-<p>Здесь будет  о машинах.</p>
+<div class="container">
+  <h1>Машины</h1>
+
+  <form (ngSubmit)="onSubmit()" class="car-form">
+    <input type="text" [(ngModel)]="currentCar.vin" name="vin" placeholder="VIN" required />
+    <input type="text" [(ngModel)]="currentCar.markModel" name="markModel" placeholder="Марка и модель" required />
+    <input type="number" [(ngModel)]="currentCar.yearManufacture" name="yearManufacture" placeholder="Год выпуска" min="1900" max="2100" required />
+    <input type="text" [(ngModel)]="currentCar.plateNum" name="plateNum" placeholder="Номерной знак" />
+    <input type="date" [(ngModel)]="currentCar.lastServiceDate" name="lastServiceDate" placeholder="Дата последнего обслуживания" />
+    <input type="number" [(ngModel)]="currentCar.clientId" name="clientId" placeholder="ID клиента" required />
+
+    <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} машину</button>
+    <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
+  </form>
+
+  <div *ngFor="let car of cars" class="car-card">
+    <h2>ID: {{ car.id }} — {{ car.markModel }}</h2>
+    <p><strong>VIN:</strong> {{ car.vin || '-' }}</p>
+    <p><strong>Год выпуска:</strong> {{ car.yearManufacture }}</p>
+    <p><strong>Номерной знак:</strong> {{ car.plateNum || '-' }}</p>
+    <p><strong>Дата последнего обслуживания:</strong> {{ car.lastServiceDate || '-' }}</p>
+    <p><strong>ID клиента:</strong> {{ car.clientId || '-' }}</p>
+
+    <button (click)="editCar(car)">Редактировать</button>
+    <button (click)="deleteCar(car.id!)">Удалить</button>
+  </div>
+
+  <div class="toast-message" *ngIf="message" [ngClass]="{ 'error': isError, 'success': !isError }">
+    {{ message }}
+  </div>
+</div>

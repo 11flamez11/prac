@@ -19,7 +19,8 @@ public class ClientService {
     private ClientRepository clientRepository;
 
     public List<ClientDto> getAllClients() {
-        return clientRepository.findAll().stream()
+        return clientRepository.findAllByOrderByIdAsc()
+                .stream()
                 .map(ClientMapper::toDto)
                 .collect(Collectors.toList());
     }

@@ -1,2 +1,25 @@
-<h2>Service Component</h2>
-<p>Информация об услугах.</p>
+<div class="container">
+  <h1>Услуги</h1>
+
+  <form (ngSubmit)="onSubmit()" class="service-form">
+    <input type="text" [(ngModel)]="currentService.name" name="name" placeholder="Название" required />
+    <input type="text" [(ngModel)]="currentService.description" name="description" placeholder="Описание" />
+    <input type="number" [(ngModel)]="currentService.price" name="price" placeholder="Цена" required />
+
+    <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} услугу</button>
+    <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
+  </form>
+
+  <div *ngFor="let service of services" class="service-card">
+    <h2>ID: {{ service.id }} - {{ service.name }}</h2>
+    <p><strong>Описание:</strong> {{ service.description }}</p>
+    <p><strong>Цена:</strong> {{ service.price }} ₽</p>
+
+    <button (click)="editService(service)">Редактировать</button>
+    <button (click)="deleteService(service.id!)">Удалить</button>
+  </div>
+</div>
+
+<div class="toast-message" *ngIf="message" [ngClass]="{ 'error': isError, 'success': !isError }">
+  {{ message }}
+</div>

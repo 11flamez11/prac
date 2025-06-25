@@ -1,6 +1,27 @@
-<h2>Клиенты</h2>
-<ul>
-  <li *ngFor="let client of clients">
-    {{ client.name }} - {{ client.phone }} - {{ client.email }} - {{ client.address }}
-  </li>
-</ul>
+<div class="container">
+  <h1>Клиенты</h1>
+
+  <form (ngSubmit)="onSubmit()" class="client-form">
+    <input type="text" [(ngModel)]="currentClient.name" name="name" placeholder="Имя" required />
+    <input type="text" [(ngModel)]="currentClient.phone" name="phone" placeholder="Телефон" />
+    <input type="email" [(ngModel)]="currentClient.email" name="email" placeholder="Email" />
+    <input type="text" [(ngModel)]="currentClient.address" name="address" placeholder="Адрес" />
+
+    <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} клиента</button>
+    <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
+  </form>
+
+  <div *ngFor="let client of clients" class="client-card">
+    <h2>ID: {{ client.id }} - {{ client.name }}</h2>
+    <p><strong>Телефон:</strong> {{ client.phone }}</p>
+    <p><strong>Email:</strong> {{ client.email }}</p>
+    <p><strong>Адрес:</strong> {{ client.address }}</p>
+
+    <button (click)="editClient(client)">Редактировать</button>
+    <button (click)="deleteClient(client.id!)">Удалить</button>
+  </div>
+</div>
+
+<div class="toast-message" *ngIf="message" [ngClass]="{ 'error': isError, 'success': !isError }">
+  {{ message }}
+</div>

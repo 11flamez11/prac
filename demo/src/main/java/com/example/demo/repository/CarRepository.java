@@ -4,6 +4,7 @@ import com.example.demo.model.Car;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
 
@@ -17,4 +18,12 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     List<Car> findByClientId(Long clientId);
 
+    default List<Car> findAllSortedById() {
+        return findAll(Sort.by(Sort.Direction.ASC, "id"));
+    }
+    default List<Car> findByClientIdSorted(Long clientId) {
+        return findByClientId(clientId, Sort.by(Sort.Direction.ASC, "id"));
+    }
+
+    List<Car> findByClientId(Long clientId, Sort sort);
 }
