@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "client")
 public class Client {
@@ -19,9 +22,12 @@ public class Client {
 
     @Email(message = "Email должен быть валидным")
     @NotBlank(message = "Email не должен быть пустым")
+    @Column(unique = true)
     private String email;
 
     private String address;
+    @OneToMany(mappedBy = "client",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Car> cars = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -61,5 +67,13 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
 }

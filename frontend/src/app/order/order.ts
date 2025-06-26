@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class OrderComponent implements OnInit {
   orders: OrderDto[] = [];
-  currentOrder: Partial<OrderDto> = { carId: 0, serviceId: 0, orderDate: '', completionDate: '', status: '', totalCost: 0 };
+  currentOrder: Partial<OrderDto> = { carId: undefined, serviceId: undefined, orderDate: '', completionDate: '', status: '', totalCost: undefined };
   isEditing = false;
 
   searchCriteria: {
@@ -101,7 +101,7 @@ searchOrders() {
   }
 
   resetForm() {
-    this.currentOrder = { carId: 0, serviceId: 0, orderDate: '', completionDate: '', status: '', totalCost: 0 };
+    this.currentOrder = { carId: undefined, serviceId: undefined, orderDate: '', completionDate: '', status: '', totalCost: undefined };
   }
 
   handleError(error: any) {

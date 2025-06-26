@@ -102,7 +102,11 @@ export class ClientComponent implements OnInit {
   handleError(error: any) {
     if (error.status === 400 && error.error) {
       this.showMessage('Ошибка: ' + JSON.stringify(error.error), true);
-    } else {
+    }
+    else if (error.status === 409 && error.error) {
+               this.showMessage('Ошибка: ' + JSON.stringify(error.error), true);
+    }
+    else {
       this.showMessage('Произошла ошибка. Пожалуйста, попробуйте снова.', true);
     }
   }

@@ -2,10 +2,14 @@ package com.example.demo.dto;
 
 import com.example.demo.validation.OnCreate;
 import com.example.demo.validation.OnUpdate;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
+
+import java.util.List;
 
 public class ClientDto {
 
+    private List <CarDto> cars;
     @NotNull(groups = OnUpdate.class, message = "ID обязателен при обновлении")
     private Long id;
 
@@ -67,4 +71,5 @@ public class ClientDto {
     public void setAddress(String address) {
         this.address = address;
     }
+
 }

@@ -1,7 +1,10 @@
 package com.example.demo.mapper;
 
+import com.example.demo.dto.CarDto;
 import com.example.demo.dto.ClientDto;
 import com.example.demo.model.Client;
+
+import java.util.List;
 
 public class ClientMapper {
 

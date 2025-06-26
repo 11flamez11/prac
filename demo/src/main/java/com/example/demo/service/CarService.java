@@ -7,6 +7,7 @@ import com.example.demo.model.Client;
 import com.example.demo.model.OrderEntity;
 import com.example.demo.repository.CarRepository;
 import com.example.demo.repository.ClientRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

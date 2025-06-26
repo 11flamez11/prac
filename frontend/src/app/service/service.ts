@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 export class ServiceComponent implements OnInit {
 
   services: ServiceDto[] = [];
-  currentService: ServiceDto = { name: '', description: '', price: 0 };
+  currentService: ServiceDto = { name: '', description: '', price: undefined};
   isEditing = false;
 
   message = '';
@@ -75,7 +75,7 @@ loadServices() {
   }
 
   resetForm() {
-    this.currentService = { name: '', description: '', price: 0 };
+    this.currentService = { name: '', description: '', price: undefined };
   }
 
   handleError(error: any) {

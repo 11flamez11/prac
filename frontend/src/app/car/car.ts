@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CarService, CarDto } from './car.service';
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ClientService, ClientDto} from '../client/client.service';
 
 @Component({
   selector: 'app-car',
@@ -21,7 +22,8 @@ export class CarComponent implements OnInit {
     clientId: undefined
   };
   isEditing = false;
-
+  showClientModal = false;
+  client:ClientDto={ name: '', phone: '', email: '', address: '' };
 
   message = '';
   isError = false;
@@ -34,7 +36,7 @@ export class CarComponent implements OnInit {
       carId?: number;
     } = {};
 
-  constructor(private carService: CarService) {}
+  constructor(private carService: CarService, private clientService: ClientService) {}
 
   ngOnInit() {
     this.loadCars();
@@ -122,10 +124,30 @@ export class CarComponent implements OnInit {
     };
   }
 
+  onClientIdClick(clientId?: number) {
+    if (!clientId) return;
+
+    this.clientService.getClientById(clientId).subscribe({
+      next: (client) => {
+        this.client = client;
+        this.showClientModal = true;
+      },
+      error: (error) => this.handleError(error)
+    });
+  }
+
+  closeClientModal() {
+    this.showClientModal = false;
+  }
+
   handleError(error: any) {
     if (error.status === 400 && error.error) {
       this.showMessage('Ошибка: ' + JSON.stringify(error.error), true);
-    } else {
+    }
+    else if (error.status === 409 && error.error) {
+                   this.showMessage('Ошибка: ' + JSON.stringify(error.error), true);
+    }
+    else {
       this.showMessage('Произошла ошибка. Пожалуйста, попробуйте снова.', true);
     }
   }

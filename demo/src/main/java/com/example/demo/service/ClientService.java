@@ -26,6 +26,8 @@ public class ClientService {
                 .collect(Collectors.toList());
     }
 
+
+
     public ResponseEntity<ClientDto> getClientById(Long id) {
         Optional<Client> client = clientRepository.findById(id);
         return client.map(c -> ResponseEntity.ok(ClientMapper.toDto(c)))

@@ -41,13 +41,50 @@
     <p><strong>Год выпуска:</strong> {{ car.yearManufacture }}</p>
     <p><strong>Номерной знак:</strong> {{ car.plateNum || '-' }}</p>
     <p><strong>Дата последнего обслуживания:</strong> {{ car.lastServiceDate || '-' }}</p>
-    <p><strong>ID клиента:</strong> {{ car.clientId || '-' }}</p>
+    <p>
+      <strong>ID клиента:</strong>
+      <span
+        *ngIf="car.clientId; else noClient"
+        class="client-link"
+        (click)="onClientIdClick(car.clientId)"
+      >
+    {{ car.clientId }}
+  </span>
+      <ng-template #noClient>-</ng-template>
+    </p>
 
     <button (click)="editCar(car)">Редактировать</button>
     <button (click)="deleteCar(car.id!)">Удалить</button>
   </div>
 
+  <div class="modal-overlay" *ngIf="showClientModal" (click)="closeClientModal()"></div>
+  <div class="client-modal" *ngIf="showClientModal">
+    <h2>Информация о клиенте</h2>
+    <table>
+      <tr>
+        <td><strong>Имя:</strong></td>
+        <td>{{ client.name }}</td>
+      </tr>
+      <tr>
+        <td><strong>Телефон:</strong></td>
+        <td>{{ client.phone }}</td>
+      </tr>
+      <tr>
+        <td><strong>Email:</strong></td>
+        <td>{{ client.email }}</td>
+      </tr>
+      <tr>
+        <td><strong>Адрес:</strong></td>
+        <td>{{ client.address }}</td>
+      </tr>
+    </table>
+    <button (click)="closeClientModal()">Закрыть</button>
+  </div>
+
+
   <div class="toast-message" *ngIf="message" [ngClass]="{ 'error': isError, 'success': !isError }">
     {{ message }}
   </div>
+
+
 </div>

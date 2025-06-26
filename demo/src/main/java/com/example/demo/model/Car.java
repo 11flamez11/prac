@@ -1,8 +1,11 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.Order;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "car")
@@ -11,7 +14,7 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "car_id")
     private Long id;
-
+    @Column(unique = true)
     private String vin;
 
     @Column(name = "mark_model")
@@ -26,9 +29,10 @@ public class Car {
     @Column(name = "last_service_date")
     private LocalDate lastServiceDate;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "client_id",nullable = false)
     private Client client;
+
 
     public Long getId() {
         return id;

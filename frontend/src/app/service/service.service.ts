@@ -6,7 +6,7 @@ export interface ServiceDto {
   id?: number;
   name: string;
   description: string;
-  price: number;
+  price: undefined;
 }
 
 @Injectable({
