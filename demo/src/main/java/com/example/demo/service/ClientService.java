@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,16 +71,23 @@ public class ClientService {
         return ResponseEntity.noContent().build();
     }
 
-    public List<ClientDto> searchClients(String name, String phone, String email, String address) {
+    public List<ClientDto> searchClients(String name, String phone, String email, Long clientId, String address) {
         List<Client> clients;
 
-        if (name != null) {
+        if (clientId != null) {
+            Optional<Client> clientOpt = clientRepository.findById(clientId);
+            if (clientOpt.isPresent()) {
+                clients = List.of(clientOpt.get());
+            } else {
+                clients = Collections.emptyList();
+            }
+        } else if (name != null && !name.isEmpty()) {
             clients = clientRepository.findByNameContainingIgnoreCase(name);
-        } else if (phone != null) {
+        } else if (phone != null && !phone.isEmpty()) {
             clients = clientRepository.findByPhoneContainingIgnoreCase(phone);
-        } else if (email != null) {
+        } else if (email != null && !email.isEmpty()) {
             clients = clientRepository.findByEmailContainingIgnoreCase(email);
-        } else if (address != null) {
+        } else if (address != null && !address.isEmpty()) {
             clients = clientRepository.findByAddressContainingIgnoreCase(address);
         } else {
             clients = clientRepository.findAll();
@@ -89,4 +97,6 @@ public class ClientService {
                 .map(ClientMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+
 }

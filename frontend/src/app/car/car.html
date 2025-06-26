@@ -1,17 +1,39 @@
 <div class="container">
   <h1>Машины</h1>
 
-  <form (ngSubmit)="onSubmit()" class="car-form">
-    <input type="text" [(ngModel)]="currentCar.vin" name="vin" placeholder="VIN" required />
-    <input type="text" [(ngModel)]="currentCar.markModel" name="markModel" placeholder="Марка и модель" required />
-    <input type="number" [(ngModel)]="currentCar.yearManufacture" name="yearManufacture" placeholder="Год выпуска" min="1900" max="2100" required />
-    <input type="text" [(ngModel)]="currentCar.plateNum" name="plateNum" placeholder="Номерной знак" />
-    <input type="date" [(ngModel)]="currentCar.lastServiceDate" name="lastServiceDate" placeholder="Дата последнего обслуживания" />
-    <input type="number" [(ngModel)]="currentCar.clientId" name="clientId" placeholder="ID клиента" required />
+  <div class="forms-wrapper">
+    <form (ngSubmit)="onSubmit()" class="car-form">
+      <input type="text" [(ngModel)]="currentCar.vin" name="vin" placeholder="VIN" required />
+      <input type="text" [(ngModel)]="currentCar.markModel" name="markModel" placeholder="Марка и модель" required />
+      <input type="number" [(ngModel)]="currentCar.yearManufacture" name="yearManufacture" placeholder="Год выпуска" min="1900" max="2100" required />
+      <input type="text" [(ngModel)]="currentCar.plateNum" name="plateNum" placeholder="Номерной знак" />
+      <input type="date" [(ngModel)]="currentCar.lastServiceDate" name="lastServiceDate" placeholder="Дата последнего обслуживания" />
+      <input type="number" [(ngModel)]="currentCar.clientId" name="clientId" placeholder="ID клиента" required />
 
-    <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} машину</button>
-    <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
-  </form>
+      <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} машину</button>
+      <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
+    </form>
+
+    <form (ngSubmit)="searchCars()" class="search-form">
+      <label>ID машины:
+        <input type="number" [(ngModel)]="searchCriteria.carId" name="searchCarId" />
+      </label>
+      <label>Марка и модель:
+        <input type="text" [(ngModel)]="searchCriteria.markModel" name="searchMarkModel" />
+      </label>
+      <label>Номерной знак:
+        <input type="text" [(ngModel)]="searchCriteria.plateNum" name="searchPlateNum" />
+      </label>
+      <label>ID клиента:
+        <input type="number" [(ngModel)]="searchCriteria.clientId" name="searchClientId" />
+      </label>
+      <label>Дата обслуживания:
+        <input type="date" [(ngModel)]="searchCriteria.lastServiceDate" name="searchLastServiceDate" />
+      </label>
+      <button type="submit">Поиск</button>
+      <button type="button" (click)="resetSearch()">Сброс</button>
+    </form>
+  </div>
 
   <div *ngFor="let car of cars" class="car-card">
     <h2>ID: {{ car.id }} — {{ car.markModel }}</h2>

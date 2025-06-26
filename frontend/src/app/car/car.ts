@@ -22,8 +22,17 @@ export class CarComponent implements OnInit {
   };
   isEditing = false;
 
+
   message = '';
   isError = false;
+
+  searchCriteria: {
+      markModel?: string;
+      plateNum?: string;
+      clientId?: number;
+      lastServiceDate?: string;
+      carId?: number;
+    } = {};
 
   constructor(private carService: CarService) {}
 
@@ -62,6 +71,21 @@ export class CarComponent implements OnInit {
       });
     }
   }
+
+  searchCars() {
+      this.carService.searchCars(this.searchCriteria).subscribe({
+        next: data => {
+          this.cars = data;
+          this.showMessage(`Найдено машин: ${data.length}`);
+        },
+        error: error => this.handleError(error)
+      });
+    }
+
+    resetSearch() {
+      this.searchCriteria = {};
+      this.loadCars();
+    }
 
   editCar(car: CarDto) {
     this.currentCar = { ...car };

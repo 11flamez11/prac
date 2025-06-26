@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -49,12 +48,13 @@ public class CarController {
             @RequestParam(required = false) String vin,
             @RequestParam(required = false) String markModel,
             @RequestParam(required = false) String plateNum,
-            @RequestParam(required = false) Integer yearManufacture) {
-        return carService.searchCars(vin, markModel, plateNum, yearManufacture);
+            @RequestParam(required = false) Integer yearManufacture,
+            @RequestParam(required = false) String lastServiceDate,
+            @RequestParam(required = false) Long clientId,
+            @RequestParam(required = false) Long carId
+    ) {
+
+        return carService.searchCars(carId, vin, markModel, plateNum, yearManufacture, lastServiceDate, clientId);
     }
 
-    @GetMapping("/by-client/{clientId}")
-    public ResponseEntity<List<CarDto>> getCarsByClientId(@PathVariable Long clientId) {
-        return carService.getCarsByClientId(clientId);
-    }
 }

@@ -37,13 +37,11 @@ export class ClientService {
   deleteClient(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
-
-  searchClients(params: { name?: string; phone?: string; email?: string; address?: string; }): Observable<ClientDto[]> {
+  searchClients(params: { name?: string; phone?: string; clientId?: number }): Observable<ClientDto[]> {
     const queryParams = new URLSearchParams();
-    if(params.name) queryParams.append('name', params.name);
-    if(params.phone) queryParams.append('phone', params.phone);
-    if(params.email) queryParams.append('email', params.email);
-    if(params.address) queryParams.append('address', params.address);
+    if (params.name) queryParams.append('name', params.name);
+    if (params.phone) queryParams.append('phone', params.phone);
+    if (params.clientId !== undefined && params.clientId !== null) queryParams.append('clientId', params.clientId.toString());
     return this.http.get<ClientDto[]>(`${this.baseUrl}/search?${queryParams.toString()}`);
   }
 }

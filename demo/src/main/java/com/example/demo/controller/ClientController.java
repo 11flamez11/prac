@@ -52,8 +52,9 @@ public class ClientController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String email,
+            @RequestParam(required = false) Long clientId,
             @RequestParam(required = false) String address
     ) {
-        return clientService.searchClients(name, phone, email, address);
+        return clientService.searchClients(name, phone, email,clientId, address);
     }
 }

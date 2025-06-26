@@ -15,6 +15,13 @@ export class OrderComponent implements OnInit {
   currentOrder: Partial<OrderDto> = { carId: 0, serviceId: 0, orderDate: '', completionDate: '', status: '', totalCost: 0 };
   isEditing = false;
 
+  searchCriteria: {
+    orderDate?: string;
+    completionDate?: string;
+    status?: string;
+    orderId?: number;
+  } = {};
+
   message = '';
   isError = false;
 
@@ -24,11 +31,12 @@ export class OrderComponent implements OnInit {
     this.loadOrders();
   }
 
-loadOrders() {
-  this.orderService.getAllOrders().subscribe(data => {
-    this.orders = data.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
-  });
-}
+  loadOrders() {
+    this.orderService.getAllOrders().subscribe(data => {
+      this.orders = data.sort((a, b) => (a.id ?? 0) - (b.id ?? 0));
+    });
+  }
+
   onSubmit() {
     if (this.isEditing && this.currentOrder.id) {
       this.orderService.updateOrder(this.currentOrder.id, this.currentOrder as OrderDto).subscribe({
@@ -53,11 +61,13 @@ loadOrders() {
   }
 
   editOrder(order: OrderDto) {
-    this.currentOrder = { ...order }; // Тут ID нужно для обновления
+    this.currentOrder = { ...order };
     this.isEditing = true;
   }
 
-  deleteOrder(id: number) {
+  deleteOrder(id?: number) {
+    if (id === undefined) return;
+
     if (confirm('Вы уверены, что хотите удалить этот заказ?')) {
       this.orderService.deleteOrder(id).subscribe({
         next: () => {
@@ -68,6 +78,22 @@ loadOrders() {
       });
     }
   }
+
+searchOrders() {
+  this.orderService.searchOrders(this.searchCriteria).subscribe({
+    next: data => {
+      this.orders = data;
+      this.showMessage(`Найдено заказов: ${data.length}`);
+    },
+    error: error => this.handleError(error)
+  });
+}
+
+  resetSearch() {
+    this.searchCriteria = {};
+    this.loadOrders();
+  }
+
 
   cancelEdit() {
     this.resetForm();

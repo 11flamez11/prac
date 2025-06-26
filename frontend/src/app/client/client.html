@@ -1,6 +1,7 @@
 <div class="container">
   <h1>Клиенты</h1>
 
+
   <form (ngSubmit)="onSubmit()" class="client-form">
     <input type="text" [(ngModel)]="currentClient.name" name="name" placeholder="Имя" required />
     <input type="text" [(ngModel)]="currentClient.phone" name="phone" placeholder="Телефон" />
@@ -10,6 +11,21 @@
     <button type="submit">{{ isEditing ? 'Обновить' : 'Добавить' }} клиента</button>
     <button *ngIf="isEditing" type="button" (click)="cancelEdit()">Отмена</button>
   </form>
+
+  <form (ngSubmit)="searchClients()" class="search-form">
+    <label>Имя:
+      <input type="text" [(ngModel)]="searchCriteria.name" name="searchName" />
+    </label>
+    <label>Телефон:
+      <input type="text" [(ngModel)]="searchCriteria.phone" name="searchPhone" />
+    </label>
+    <label>ID клиента:
+      <input type="number" [(ngModel)]="searchCriteria.clientId" name="searchClientId" />
+    </label>
+    <button type="submit">Поиск</button>
+    <button type="button" (click)="resetSearch()">Сброс</button>
+  </form>
+
 
   <div *ngFor="let client of clients" class="client-card">
     <h2>ID: {{ client.id }} - {{ client.name }}</h2>

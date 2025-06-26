@@ -45,4 +45,16 @@ public class OrderController {
     public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
         return orderService.deleteOrder(id);
     }
+
+    @GetMapping("/search")
+    public List<OrderDto> searchOrders(
+            @RequestParam(required = false) Long orderId,
+            @RequestParam(required = false) String orderDate,
+            @RequestParam(required = false) String completionDate,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Double minCost,
+            @RequestParam(required = false) Double maxCost
+    ) {
+        return orderService.searchOrders(orderId, orderDate, completionDate, status, minCost, maxCost);
+    }
 }

@@ -82,6 +82,49 @@ h1 {
   }
 }
 
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.search-form label {
+  flex: 1 1 150px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  min-width: 170px;
+}
+
+.search-form input {
+  margin-top: 5px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.search-form button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.search-form button:hover {
+  background-color: #0056b3;
+}
+
+
 .toast-message {
   position: fixed;
   top: 20px;

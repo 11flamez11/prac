@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.dto.OrderDto;
 import com.example.demo.mapper.OrderMapper;
 import com.example.demo.model.Car;
+import com.example.demo.model.Client;
 import com.example.demo.model.OrderEntity;
 import com.example.demo.model.ServiceEntity;
 import com.example.demo.repository.CarRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,17 +114,30 @@ public class OrderService {
         return ResponseEntity.noContent().build();
     }
 
-    public List<OrderEntity> searchOrders(String orderDate, String completionDate, String status, Double minCost, Double maxCost) {
-        if (orderDate != null) {
-            return orderRepository.findByOrderDate(LocalDate.parse(orderDate));
+    public List<OrderDto> searchOrders(Long orderId, String orderDate, String completionDate, String status, Double minCost, Double maxCost) {
+        List<OrderEntity> orders;
+        if (orderId != null) {
+            Optional<OrderEntity> orderOpt = orderRepository.findById(orderId);
+            if (orderOpt.isPresent()) {
+                orders = List.of(orderOpt.get());
+            } else {
+                orders = Collections.emptyList();
+            }
+        }else if (orderDate != null) {
+            orders = orderRepository.findByOrderDate(LocalDate.parse(orderDate));
         } else if (completionDate != null) {
-            return orderRepository.findByCompletionDate(LocalDate.parse(completionDate));
+            orders = orderRepository.findByCompletionDate(LocalDate.parse(completionDate));
         } else if (status != null) {
-            return orderRepository.findByStatusContainingIgnoreCase(status);
+            orders = orderRepository.findByStatusContainingIgnoreCase(status);
         } else if (minCost != null && maxCost != null) {
-            return orderRepository.findByTotalCostBetween(minCost, maxCost);
+            orders = orderRepository.findByTotalCostBetween(minCost, maxCost);
         } else {
-            return orderRepository.findAll();
+            orders = orderRepository.findAll();
         }
+
+        return orders.stream()
+                .map(OrderMapper::toDto)
+                .toList();
     }
+
 }

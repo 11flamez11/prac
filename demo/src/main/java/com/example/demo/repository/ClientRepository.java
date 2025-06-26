@@ -16,4 +16,5 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findByAddressContainingIgnoreCase(String address);
 
     List<Client> findAllByOrderByIdAsc();
+
 }

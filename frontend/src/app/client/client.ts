@@ -14,6 +14,7 @@ export class ClientComponent implements OnInit {
   clients: ClientDto[] = [];
   currentClient: ClientDto = { name: '', phone: '', email: '', address: '' };
   isEditing = false;
+  searchCriteria: { name?: string; phone?: string; clientId?: number } = {};
 
   message = '';
   isError = false;
@@ -54,6 +55,20 @@ export class ClientComponent implements OnInit {
         }
       });
     }
+  }
+
+  searchClients() {
+    this.clientService.searchClients(this.searchCriteria).subscribe({
+      next: data => {
+        this.clients = data;
+        this.showMessage(`Найдено клиентов: ${data.length}`);
+      },
+      error: error => this.handleError(error)
+    });
+  }
+  resetSearch() {
+    this.searchCriteria = {};
+    this.loadClients();
   }
 
   editClient(client: ClientDto) {
@@ -100,4 +115,5 @@ export class ClientComponent implements OnInit {
       this.message = '';
     }, 3000);
   }
+
 }

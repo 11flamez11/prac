@@ -4,6 +4,7 @@ import com.example.demo.dto.CarDto;
 import com.example.demo.mapper.CarMapper;
 import com.example.demo.model.Car;
 import com.example.demo.model.Client;
+import com.example.demo.model.OrderEntity;
 import com.example.demo.repository.CarRepository;
 import com.example.demo.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -93,20 +96,35 @@ public class CarService {
         }
     }
 
-    public List<CarDto> searchCars(String vin, String markModel, String plateNum, Integer yearManufacture) {
-        return carRepository.findAll().stream()
-                .filter(car -> (vin == null || car.getVin().equalsIgnoreCase(vin)) &&
-                        (markModel == null || car.getMarkModel().equalsIgnoreCase(markModel)) &&
-                        (plateNum == null || car.getPlateNum().equalsIgnoreCase(plateNum)) &&
-                        (yearManufacture == null || car.getYearManufacture() == yearManufacture))
+    public List<CarDto> searchCars(Long carId, String vin, String markModel, String plateNum, Integer yearManufacture, String lastServiceDate, Long clientId) {
+        List<Car> cars;
+        if (carId != null) {
+            Optional<Car> carOpt = carRepository.findById(carId);
+            if (carOpt.isPresent()) {
+                cars = List.of(carOpt.get());
+            } else {
+                cars = Collections.emptyList();
+            }
+        }else if (vin != null) {
+            cars = carRepository.findByVinContainingIgnoreCase(vin);
+        } else if (markModel != null) {
+            cars = carRepository.findByMarkModelContainingIgnoreCase(markModel);
+        } else if (plateNum != null) {
+            cars = carRepository.findByPlateNumContainingIgnoreCase(plateNum);
+        } else if (yearManufacture != null) {
+            cars = carRepository.findByYearManufacture(yearManufacture);
+        } else if (lastServiceDate != null) {
+            cars = carRepository.findByLastServiceDate(LocalDate.parse(lastServiceDate));
+        } else if (clientId != null) {
+            cars = carRepository.findByClientId(clientId, Sort.by(Sort.Direction.ASC, "id"));
+        } else {
+            cars = carRepository.findAll();
+        }
+
+        return cars.stream()
                 .map(CarMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    public ResponseEntity<List<CarDto>> getCarsByClientId(Long clientId) {
-        List<CarDto> cars = carRepository.findByClientId(clientId, Sort.by(Sort.Direction.ASC, "id")).stream()
-                .map(CarMapper::toDto)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(cars);
-    }
+
 }
